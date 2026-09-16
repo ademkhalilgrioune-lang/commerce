@@ -67,14 +67,18 @@ function Panier() {
         }
     };
 
+
+
     const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
-            return photoPath;
-        }
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-        return `${API_URL}${photoPath}`;
-    };
+    if (!photoPath) return null;
+
+    if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
+        return photoPath;
+    }
+
+    const timestamp = Date.now();
+    return `${import.meta.env.VITE_API_URL}${photoPath}?t=${timestamp}`;
+};
 
     if (chargement) {
         return (
