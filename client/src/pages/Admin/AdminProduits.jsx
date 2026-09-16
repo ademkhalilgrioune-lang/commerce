@@ -55,7 +55,8 @@ function AdminProduits() {
         if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
             return photoPath;
         }
-        return `http://192.168.100.6:5001${photoPath}`;
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        return `${API_URL}${photoPath}`;
     };
 
     const getCategorieNom = (id) => {
