@@ -1709,10 +1709,22 @@ app.post('/api/auth/resend-password-otp', verifierToken, async (req, res) => {
 // HEALTH CHECK
 // ==========================================
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        message: '🚀 Serveur en ligne',
-        cache: '✅ Redis connected'
+    redisClient.set('health_test', 'ok', 10, (err) => {
+        if (err) {
+            console.error('❌ Redis health check:', err);
+            return res.status(500).json({
+                status: 'OK',
+                mysql: 'connected',
+                redis: '❌ NOT WORKING',
+                error: err.message
+            });
+        }
+
+        res.json({
+            status: 'OK',
+            mysql: 'connected',
+            redis: '✅ WORKING'
+        });
     });
 });
 
