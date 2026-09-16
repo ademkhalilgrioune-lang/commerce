@@ -2154,17 +2154,12 @@ app.get('/api/admin/orders', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
-        const [orders] = await db.promise().query(
-
-            `SELECT c.*, u.nom AS nom_utilisateur 
-
-             FROM commandes c
-
-             JOIN utilisateurs u ON c.id_utilisateur = u.id
-
-             ORDER BY c.date_commande DESC`
-
-        );
+const [commandes] = await db.promise().query(`
+    SELECT c.*, u.nom AS nom_utilisateur
+    FROM commandes c
+    JOIN utilisateurs u ON c.id_utilisateur = u.id
+    ORDER BY c.date_commande DESC
+`);
 
         res.json(orders);
 
