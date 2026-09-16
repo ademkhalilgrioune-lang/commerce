@@ -2154,7 +2154,7 @@ app.get('/api/admin/orders', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
-const [commandes] = await db.promise().query(`
+const [orders] = await db.promise().query(`
     SELECT c.*, u.nom AS nom_utilisateur
     FROM commandes c
     JOIN utilisateurs u ON c.id_utilisateur = u.id
