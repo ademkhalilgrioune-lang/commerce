@@ -1306,15 +1306,16 @@ app.get('/api/admin/orders', verifierToken, verifierAdmin, async (req, res) => {
 // ==========================================
 // ROUTE PUT /api/admin/orders/:id/status - AVEC TRANSACTION
 // ==========================================
-// ==========================================
+
 // ROUTE PUT /api/admin/orders/:id/status - AVEC TRANSACTION (CORRIGÉE)
 // ==========================================
-// ==========================================
+
 // ROUTE PUT /api/admin/orders/:id/status - AVEC LOGIQUE STOCK
 // ==========================================
-// ==========================================
+
 // ROUTE PUT /api/admin/orders/:id/status - LOGIQUE STOCK SIMPLIFIÉE
 // ==========================================
+
 app.put('/api/admin/orders/:id/status', verifierToken, verifierAdmin, async (req, res) => {
     const connection = db.promise();
     
