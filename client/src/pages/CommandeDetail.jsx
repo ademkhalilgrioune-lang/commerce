@@ -57,13 +57,15 @@ function CommandeDetail() {
         return <span className={`badge ${classes[statut] || 'badge-warning'}`}>{labels[statut] || statut}</span>;
     };
 
-    const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
-            return photoPath;
-        }
-        return `http://192.168.100.6:5001${photoPath}`;
-    };
+const getImageUrl = (photoPath) => {
+    if (!photoPath) return null;
+
+    if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
+        return photoPath;
+    }
+
+    return `${import.meta.env.VITE_API_URL}${photoPath}`;
+};
 
     const ouvrirModal = (statut, message) => {
         setModalStatut(statut);
