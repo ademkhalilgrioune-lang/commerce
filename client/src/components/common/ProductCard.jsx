@@ -7,17 +7,18 @@ function ProductCard({ produit, onAjouterPanier, showAddButton = true }) {
     const { user } = useAuth();
     const isAdmin = user?.role === 'admin';
 
-    const BASE_URL = 'http://192.168.100.6:5001';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-    const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
-            return photoPath;
-        }
-        // ✅ Cache busting - force le rechargement de l'image
-        const timestamp = Date.now();
-        return `${BASE_URL}${photoPath}?t=${timestamp}`;
-    };
+const getImageUrl = (photoPath) => {
+    if (!photoPath) return null;
+
+    if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
+        return photoPath;
+    }
+
+    const timestamp = Date.now();
+    return `${BASE_URL}${photoPath}?t=${timestamp}`;
+};
 
     const imageUrl = getImageUrl(produit.photo);
  
