@@ -1417,7 +1417,7 @@ if (commandesAujourdhui[0].count >= LIMITE_COMMANDES_PAR_JOUR) {
     });
 }
 
-        // ✅ VÉRIFIER LE NOMBRE DE COMMANDES EN ATTENTE
+      
         const [commandesEnAttente] = await db.promise().query(
             `SELECT COUNT(*) AS count 
              FROM commandes 
