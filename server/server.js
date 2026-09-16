@@ -564,12 +564,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
             await db.promise().query(
 
-                `INSERT INTO utilisateurs (nom, email, mot_de_passe, role, email_verified, otp_code, otp_expires_at)
-
-                 VALUES (?, ?, ?, 'client', FALSE, ?, ?)`,
-
-                [nom, email, hash, otp, expiration]
-
+                `INSERT INTO utilisateurs (nom, email, mot_de_passe, role, email_verified, otp_code, otp_expires_at) VALUES (?, ?, ?, 'client', FALSE, ?, ?)`,   [nom, email, hash, otp, expiration]
             );
 
         }
