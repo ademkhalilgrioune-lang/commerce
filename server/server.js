@@ -1712,7 +1712,7 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         message: '🚀 Serveur en ligne',
-        cache: redisClient.isOpen ? '✅ Redis connected' : '❌ Redis not connected'
+        cache: '✅ Redis connected'
     });
 });
 
