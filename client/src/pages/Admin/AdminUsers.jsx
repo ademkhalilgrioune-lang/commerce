@@ -56,11 +56,13 @@ function AdminUsers() {
     const estAdmin = (role) => role === 'admin';
     const estMoi = (userId) => userId === user?.id;
 
-    if (chargement) return (
-        <div className="container section">
-            <div className="loader">⏳ Chargement...</div>
-        </div>
-    );
+    if (chargement) {
+        return (
+            <div className="container section fade">
+                <div className="loader"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="container section fade">

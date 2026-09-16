@@ -77,8 +77,8 @@ function Panier() {
 
     if (chargement) {
         return (
-            <div className="container section">
-                <div className="loader">⏳ Chargement du panier...</div>
+            <div className="container section fade">
+                <div className="loader"></div>
             </div>
         );
     }

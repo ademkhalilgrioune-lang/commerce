@@ -216,7 +216,7 @@ function ModifyProfile() {
     // ==========================================
     if (chargement) {
         return (
-            <div className="container section">
+            <div className="container section fade">
                 <div className="loader"></div>
             </div>
         );

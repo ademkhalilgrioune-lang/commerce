@@ -39,11 +39,13 @@ function MesCommandes() {
         return <span className={`badge ${classes[statut] || 'badge-warning'}`}>{labels[statut] || statut}</span>;
     };
 
-    if (chargement) return (
-        <div className="container section">
-            <div className="loader">⏳ Chargement...</div>
-        </div>
-    );
+    if (chargement) {
+        return (
+            <div className="container section fade">
+                <div className="loader"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="container section fade">
