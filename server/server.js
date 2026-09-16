@@ -1710,7 +1710,7 @@ app.post('/api/auth/resend-password-otp', verifierToken, async (req, res) => {
 // HEALTH CHECK
 // ==========================================
 app.get('/api/health', (req, res) => {
-    redisClient.set('health_test', 'ok', 10, (err) => {
+    redisClient.setex('health_test', 10, 'ok', (err) => {
         if (err) {
             console.error('❌ Redis health check:', err);
             return res.status(500).json({
