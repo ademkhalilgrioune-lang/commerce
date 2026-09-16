@@ -83,7 +83,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const authLimiter = rateLimit({
 
-windowMs: 15 * 60 * 1000, // 15 minutes
+windowMs: 5 * 60 * 1000, // 15 minutes
     max: 5,
 
     message: { message: 'Trop de tentatives, veuillez réessayer dans 15 minutes' }
