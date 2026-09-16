@@ -1690,16 +1690,16 @@ app.get('/api/produits/\:id/avis', async (req, res) => {
 
         const limit = parseInt(req.query.limit) || 5;
 
-        const [avis] = await db.promise().query(
 
-            `SELECT a.*, u.nom AS nom_utilisateur 
-             FROM avis a
-             JOIN utilisateurs u ON a.id_utilisateur = u.id
-             WHERE a.id_produit = ?
-             ORDER BY a.date_avis DESC
-             LIMIT ?`,
-            [id, limit]
-        );
+
+const [avis] = await db.promise().query(`
+    SELECT a.*, u.nom AS nom_utilisateur
+    FROM avis a
+    JOIN utilisateurs u ON a.id_utilisateur = u.id
+    WHERE a.id_produit = ?
+    ORDER BY a.date_avis DESC
+    LIMIT ?
+`, [id, limit]);
 
         const [countResult] = await db.promise().query(
 
