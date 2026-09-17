@@ -328,13 +328,15 @@ const verifierAdmin = (req, res, next) => {
 
 // Créer le dossier uploads s'il n'existe pas
 
-const uploadDir = path.join(__dirname, 'uploads', 'produits');
-
+const uploadDir = path.join(__dirname, 'server', 'uploads', 'produits');
 if (!fs.existsSync(uploadDir)) {
 
     fs.mkdirSync(uploadDir, { recursive: true });
 
 }
+
+console.log('__dirname =', __dirname);
+console.log('uploadDir =', uploadDir);
 
 // Configuration du stockage
 
@@ -471,7 +473,7 @@ app.use('/uploads', (req, res, next) => {
 
     next();
 
-}, express.static(path.join(__dirname, 'uploads')));
+}, express.static(path.join(__dirname, 'server', 'uploads'));
 
 // ==========================================
 
@@ -966,6 +968,7 @@ app.put('/api/produits/:id', verifierToken, verifierAdmin, upload.single('photo'
                 const oldFilePath = path.join(__dirname, photoPath);
 
                 try {
+
 
                     if (fs.existsSync(oldFilePath)) {
 
