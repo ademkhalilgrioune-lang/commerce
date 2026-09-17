@@ -20,7 +20,7 @@ const path = require('path');
 
 const fs = require('fs');
 
-const { Resend } = require('resend');
+const { BrevoClient } = require('@getbrevo/brevo');
 
 const rateLimit = require('express-rate-limit');
 
@@ -493,7 +493,9 @@ app.use('/uploads', (req, res, next) => {
 
 
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const brevo = new BrevoClient({
+    apiKey: process.env.BREVO_API_KEY
+});
 
 // ===============================
 
@@ -571,31 +573,28 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
         }
 
-const emailResult = await resend.emails.send({
-
-    from: 'Ma Boutique <onboarding@resend.dev>',
-
-    to: email,
-
+const emailResult = await brevo.transactionalEmails.sendTransacEmail({
+    sender: {
+        name: 'Ma Boutique',
+        email: 'ademkhalilgrioune@gmail.com'
+    },
+    to: [
+        {
+            email: email
+        }
+    ],
     subject: 'Votre code de vérification',
-
-    html: `
-
+    htmlContent: `
         <div style="font-family: Arial, sans-serif;">
-
             <h2>Vérification de votre compte</h2>
-
             <p>Votre code de vérification est :</p>
-
             <h1>${otp}</h1>
-
             <p>Ce code est valable pendant 10 minutes.</p>
-
         </div>
-
     `
-
 });
+
+console.log('📧 BREVO REGISTER RESULT:', emailResult);
 console.log('📧 REGISTER RESEND RESULT:', emailResult);
 console.log('📧 REGISTER OTP envoyé à:', email);
 
@@ -2624,34 +2623,23 @@ app.post('/api/auth/request-password-change', verifierToken, async (req, res) =>
 
         );
 
-await resend.emails.send({
-
-    from: 'Ma Boutique <onboarding@resend.dev>',
-
-    to: email,
-
+await brevo.transactionalEmails.sendTransacEmail({
+    sender: {
+        name: 'Ma Boutique',
+        email: 'ademkhalilgrioune@gmail.com'
+    },
+    to: [{ email }],
     subject: 'Code de vérification - Changement de mot de passe',
-
-    html: `
-
+    htmlContent: `
         <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-
             <h2 style="color: #e11d2e;">🔐 Changement de mot de passe</h2>
-
             <p>Votre code de vérification est :</p>
-
             <div style="text-align: center; font-size: 48px; font-weight: 800; letter-spacing: 10px; background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;">
-
                 ${otp}
-
             </div>
-
             <p style="color: #64748b;">Ce code est valable pendant <strong>10 minutes</strong>.</p>
-
         </div>
-
     `
-
 });
 
         res.json({ message: 'Code de vérification envoyé' });
@@ -2786,34 +2774,23 @@ app.post('/api/auth/resend-password-otp', verifierToken, async (req, res) => {
 
         );
 
-await resend.emails.send({
-
-    from: 'Ma Boutique <onboarding@resend.dev>',
-
-    to: email,
-
+await brevo.transactionalEmails.sendTransacEmail({
+    sender: {
+        name: 'Ma Boutique',
+        email: 'ademkhalilgrioune@gmail.com'
+    },
+    to: [{ email }],
     subject: 'Nouveau code de vérification',
-
-    html: `
-
+    htmlContent: `
         <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-
             <h2 style="color: #e11d2e;">🔄 Nouveau code de vérification</h2>
-
             <p>Votre nouveau code est :</p>
-
             <div style="text-align: center; font-size: 48px; font-weight: 800; letter-spacing: 10px; background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;">
-
                 ${otp}
-
             </div>
-
             <p style="color: #64748b;">Ce code est valable pendant <strong>10 minutes</strong>.</p>
-
         </div>
-
     `
-
 });
 
         console.log('📧 Nouveau OTP envoyé à:', email);
