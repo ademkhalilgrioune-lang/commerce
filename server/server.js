@@ -473,7 +473,7 @@ app.use('/uploads', (req, res, next) => {
 
     next();
 
-}, express.static(path.join(__dirname, 'server', 'uploads'));
+}, express.static(path.join(__dirname, 'server', 'uploads')));
 
 // ==========================================
 
