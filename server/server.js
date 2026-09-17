@@ -571,7 +571,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
         }
 
-await resend.emails.send({
+const emailResult = await resend.emails.send({
 
     from: 'Ma Boutique <onboarding@resend.dev>',
 
@@ -596,6 +596,8 @@ await resend.emails.send({
     `
 
 });
+console.log('📧 REGISTER RESEND RESULT:', emailResult);
+console.log('📧 REGISTER OTP envoyé à:', email);
 
         res.status(201).json({ message: 'Un code OTP a été envoyé à votre adresse email' });
 
