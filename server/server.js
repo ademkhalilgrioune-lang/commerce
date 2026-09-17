@@ -1,4 +1,4 @@
- // ==========================================
+// ==========================================
 
 // 1. IMPORTS
 
@@ -350,7 +350,7 @@ const storage = multer.diskStorage({
 
         // Sanitize filename to prevent path traversal
 
-        const sanitized = file.originalname.replace(/[^a-zA-Z0-9.\\-\_]/g, '');
+        const sanitized = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '');
 
         const uniqueName = Date.now() + '-' + sanitized;
 
@@ -455,7 +455,7 @@ app.use('/uploads', (req, res, next) => {
 
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
-    res.setHeader('Access-Control-Allow-Origin', '\*');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -532,7 +532,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
         const [users] = await db.promise().query(
 
-            'SELECT id, email\_verified FROM utilisateurs WHERE email = ?',
+            'SELECT id, email_verified FROM utilisateurs WHERE email = ?',
 
             [email]
 
@@ -581,13 +581,13 @@ await resend.emails.send({
 
         <div style="font-family: Arial, sans-serif;">
 
-            <h2>Vérification de votre compte\</h2>
+            <h2>Vérification de votre compte</h2>
 
-            <p>Votre code de vérification est :\</p>
+            <p>Votre code de vérification est :</p>
 
-            <h1>${otp}\</h1>
+            <h1>${otp}</h1>
 
-            <p>Ce code est valable pendant 10 minutes.\</p>
+            <p>Ce code est valable pendant 10 minutes.</p>
 
         </div>
 
@@ -627,7 +627,7 @@ app.post('/api/auth/verify-otp', otpLimiter, async (req, res) => {
 
         const [users] = await db.promise().query(
 
-            `SELECT \* FROM utilisateurs WHERE email = ? AND otp_code = ? AND otp_expires_at > NOW()`,
+            `SELECT * FROM utilisateurs WHERE email = ? AND otp_code = ? AND otp_expires_at > NOW()`,
 
             [email, otp]
 
@@ -637,7 +637,7 @@ app.post('/api/auth/verify-otp', otpLimiter, async (req, res) => {
 
             const [existing] = await db.promise().query(
 
-                'SELECT email\_verified FROM utilisateurs WHERE email = ?',
+                'SELECT email_verified FROM utilisateurs WHERE email = ?',
 
                 [email]
 
@@ -701,7 +701,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
         const [users] = await db.promise().query(
 
-            'SELECT \* FROM utilisateurs WHERE email = ?',
+            'SELECT * FROM utilisateurs WHERE email = ?',
 
             [email]
 
@@ -793,13 +793,13 @@ app.get('/api/produits', async (req, res) => {
 
         console.log(`❌ Cache miss: ${cacheKey}`);
 
-        let query = 'SELECT \* FROM produits ORDER BY nom';
+        let query = 'SELECT * FROM produits ORDER BY nom';
 
         let params = [];
 
         if (categorie) {
 
-            query = 'SELECT \* FROM produits WHERE id\_categorie = ? ORDER BY nom';
+            query = 'SELECT * FROM produits WHERE id_categorie = ? ORDER BY nom';
 
             params = [categorie];
 
@@ -823,11 +823,11 @@ app.get('/api/produits', async (req, res) => {
 
 // ==========================================
 
-// ROUTE GET /api/produits/\:id - AVEC CACHE REDIS
+// ROUTE GET /api/produits/:id - AVEC CACHE REDIS
 
 // ==========================================
 
-app.get('/api/produits/\:id', async (req, res) => {
+app.get('/api/produits/:id', async (req, res) => {
 
     try {
 
@@ -849,7 +849,7 @@ app.get('/api/produits/\:id', async (req, res) => {
 
         const [produits] = await db.promise().query(
 
-            'SELECT \* FROM produits WHERE id = ?',
+            'SELECT * FROM produits WHERE id = ?',
 
             [id]
 
@@ -901,15 +901,19 @@ app.post('/api/produits', verifierToken, verifierAdmin, upload.single('photo'), 
 
         }
 
+        const categorieId = (id_categorie === undefined || id_categorie === null || id_categorie === '')
+            ? null
+            : id_categorie;
+
         const [result] = await db.promise().query(
 
-            'INSERT INTO produits (nom, description, prix, stock, photo, id\_categorie) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO produits (nom, description, prix, stock, photo, id_categorie) VALUES (?, ?, ?, ?, ?, ?)',
 
-            [nom, description || null, prix, stock || 0, photoPath, id_categorie]
+            [nom, description || null, prix, stock || 0, photoPath, categorieId]
 
         );
 
-        await clearCache('produits\_\*');
+        await clearCache('produits_*');
 
         res.status(201).json({
 
@@ -933,11 +937,11 @@ app.post('/api/produits', verifierToken, verifierAdmin, upload.single('photo'), 
 
 // ==========================================
 
-// ROUTE PUT /api/produits/\:id - VIDE LE CACHE
+// ROUTE PUT /api/produits/:id - VIDE LE CACHE
 
 // ==========================================
 
-app.put('/api/produits/\:id', verifierToken, verifierAdmin, upload.single('photo'), optimiserImageProduit, async (req, res) => {
+app.put('/api/produits/:id', verifierToken, verifierAdmin, upload.single('photo'), optimiserImageProduit, async (req, res) => {
 
     try {
 
@@ -981,15 +985,19 @@ app.put('/api/produits/\:id', verifierToken, verifierAdmin, upload.single('photo
 
         }
 
+        const categorieIdUpdate = (id_categorie === undefined || id_categorie === null || id_categorie === '')
+            ? null
+            : id_categorie;
+
         await db.promise().query(
 
-            'UPDATE produits SET nom = ?, description = ?, prix = ?, stock = ?, photo = ?, id\_categorie = ? WHERE id = ?',
+            'UPDATE produits SET nom = ?, description = ?, prix = ?, stock = ?, photo = ?, id_categorie = ? WHERE id = ?',
 
-            [nom, description, prix, stock, photoPath, id_categorie, id]
+            [nom, description, prix, stock, photoPath, categorieIdUpdate, id]
 
         );
 
-        await clearCache(`produit\_${id}`);
+        await clearCache(`produit_${id}`);
 
         await clearCache('produits_*');
 
@@ -1013,11 +1021,11 @@ app.put('/api/produits/\:id', verifierToken, verifierAdmin, upload.single('photo
 
 // ==========================================
 
-// ROUTE DELETE /api/produits/\:id - VIDE LE CACHE
+// ROUTE DELETE /api/produits/:id - VIDE LE CACHE
 
 // ==========================================
 
-app.delete('/api/produits/\:id', verifierToken, verifierAdmin, async (req, res) => {
+app.delete('/api/produits/:id', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
@@ -1037,7 +1045,7 @@ app.delete('/api/produits/\:id', verifierToken, verifierAdmin, async (req, res) 
 
         await db.promise().query(
 
-            'DELETE FROM ligne\_commandes WHERE id\_produit = ?',
+            'DELETE FROM ligne_commandes WHERE id_produit = ?',
 
             [id]
 
@@ -1115,7 +1123,7 @@ app.get('/api/categories', async (req, res) => {
 
         const [categories] = await db.promise().query(
 
-            'SELECT \* FROM categories ORDER BY nom'
+            'SELECT * FROM categories ORDER BY nom'
 
         );
 
@@ -1245,7 +1253,7 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
         let [commandes] = await db.promise().query(
 
-            'SELECT id FROM commandes WHERE id\_utilisateur = ? AND statut = "en\_cours"',
+            'SELECT id FROM commandes WHERE id_utilisateur = ? AND statut = "en_cours"',
 
             [userId]
 
@@ -1257,9 +1265,9 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
             const [result] = await db.promise().query(
 
-                'INSERT INTO commandes (id\_utilisateur, statut) VALUES (?, ?)',
+                'INSERT INTO commandes (id_utilisateur, statut) VALUES (?, ?)',
 
-                [userId, 'en\_cours']
+                [userId, 'en_cours']
 
             );
 
@@ -1275,7 +1283,7 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
         const [totalItems] = await db.promise().query(
 
-            'SELECT SUM(quantite) AS total FROM ligne\_commandes WHERE id\_commande = ?',
+            'SELECT SUM(quantite) AS total FROM ligne_commandes WHERE id_commande = ?',
 
             [commandeId]
 
@@ -1297,7 +1305,7 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
         const [existants] = await db.promise().query(
 
-            'SELECT id, quantite FROM ligne\_commandes WHERE id\_commande = ? AND id\_produit = ?',
+            'SELECT id, quantite FROM ligne_commandes WHERE id_commande = ? AND id_produit = ?',
 
             [commandeId, id_produit]
 
@@ -1321,7 +1329,7 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
             await db.promise().query(
 
-                'UPDATE ligne\_commandes SET quantite = ? WHERE id = ?',
+                'UPDATE ligne_commandes SET quantite = ? WHERE id = ?',
 
                 [nouvelleQuantite, existants[0].id]
 
@@ -1331,7 +1339,7 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
             await db.promise().query(
 
-                'INSERT INTO ligne\_commandes (id\_commande, id\_produit, quantite, prix\_unitaire) VALUES (?, ?, ?, ?)',
+                'INSERT INTO ligne_commandes (id_commande, id_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)',
 
                 [commandeId, id_produit, quantite, produits[0].prix]
 
@@ -1353,11 +1361,11 @@ app.post('/api/panier', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE DELETE /api/panier/\:id
+// ROUTE DELETE /api/panier/:id
 
 // ==========================================
 
-app.delete('/api/panier/\:id', verifierToken, async (req, res) => {
+app.delete('/api/panier/:id', verifierToken, async (req, res) => {
 
     try {
 
@@ -1403,11 +1411,11 @@ app.delete('/api/panier/\:id', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE PUT /api/panier/\:id
+// ROUTE PUT /api/panier/:id
 
 // ==========================================
 
-app.put('/api/panier/\:id', verifierToken, async (req, res) => {
+app.put('/api/panier/:id', verifierToken, async (req, res) => {
 
     try {
 
@@ -1673,11 +1681,11 @@ app.put('/api/auth/profil', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE GET /api/produits/\:id/avis - LIMITÉ À 5
+// ROUTE GET /api/produits/:id/avis - LIMITÉ À 5
 
 // ==========================================
 
-app.get('/api/produits/\:id/avis', async (req, res) => {
+app.get('/api/produits/:id/avis', async (req, res) => {
 
     try {
 
@@ -1776,7 +1784,7 @@ app.post('/api/avis', verifierToken, async (req, res) => {
 
         const [existants] = await db.promise().query(
 
-            'SELECT id FROM avis WHERE id\_utilisateur = ? AND id\_produit = ?',
+            'SELECT id FROM avis WHERE id_utilisateur = ? AND id_produit = ?',
 
             [userId, id_produit]
 
@@ -1790,7 +1798,7 @@ app.post('/api/avis', verifierToken, async (req, res) => {
 
         await db.promise().query(
 
-            'INSERT INTO avis (id\_utilisateur, id\_produit, note, commentaire) VALUES (?, ?, ?, ?)',
+            'INSERT INTO avis (id_utilisateur, id_produit, note, commentaire) VALUES (?, ?, ?, ?)',
 
             [userId, id_produit, note, commentaire || null]
 
@@ -1812,11 +1820,11 @@ app.post('/api/avis', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE PUT /api/avis/\:id - VIDE STATS CACHE
+// ROUTE PUT /api/avis/:id - VIDE STATS CACHE
 
 // ==========================================
 
-app.put('/api/avis/\:id', verifierToken, async (req, res) => {
+app.put('/api/avis/:id', verifierToken, async (req, res) => {
 
     try {
 
@@ -1828,7 +1836,7 @@ app.put('/api/avis/\:id', verifierToken, async (req, res) => {
 
         const [avis] = await db.promise().query(
 
-            'SELECT \* FROM avis WHERE id = ?',
+            'SELECT * FROM avis WHERE id = ?',
 
             [avisId]
 
@@ -1870,11 +1878,11 @@ app.put('/api/avis/\:id', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE DELETE /api/avis/\:id - VIDE STATS CACHE
+// ROUTE DELETE /api/avis/:id - VIDE STATS CACHE
 
 // ==========================================
 
-app.delete('/api/avis/\:id', verifierToken, async (req, res) => {
+app.delete('/api/avis/:id', verifierToken, async (req, res) => {
 
     try {
 
@@ -1884,7 +1892,7 @@ app.delete('/api/avis/\:id', verifierToken, async (req, res) => {
 
         const [avis] = await db.promise().query(
 
-            'SELECT \* FROM avis WHERE id = ?',
+            'SELECT * FROM avis WHERE id = ?',
 
             [avisId]
 
@@ -1946,11 +1954,11 @@ app.get('/api/stats', async (req, res) => {
 
         console.log('❌ Cache miss: stats');
 
-        const [produits] = await db.promise().query('SELECT COUNT(\*) AS total FROM produits');
+        const [produits] = await db.promise().query('SELECT COUNT(*) AS total FROM produits');
 
-        const [clients] = await db.promise().query('SELECT COUNT(\*) AS total FROM utilisateurs WHERE role = "client"');
+        const [clients] = await db.promise().query('SELECT COUNT(*) AS total FROM utilisateurs WHERE role = "client"');
 
-        const [avis] = await db.promise().query('SELECT COUNT(\*) AS total, AVG(note) AS moyenne FROM avis');
+        const [avis] = await db.promise().query('SELECT COUNT(*) AS total, AVG(note) AS moyenne FROM avis');
 
         const stats = {
 
@@ -2008,11 +2016,11 @@ app.get('/api/admin/users', verifierToken, verifierAdmin, async (req, res) => {
 
 // ==========================================
 
-// ROUTE GET /api/admin/users/\:id
+// ROUTE GET /api/admin/users/:id
 
 // ==========================================
 
-app.get('/api/admin/users/\:id', verifierToken, verifierAdmin, async (req, res) => {
+app.get('/api/admin/users/:id', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
@@ -2036,7 +2044,7 @@ app.get('/api/admin/users/\:id', verifierToken, verifierAdmin, async (req, res) 
 
     } catch (error) {
 
-        console.error('Erreur GET admin/users/\:id:', error);
+        console.error('Erreur GET admin/users/:id:', error);
 
         res.status(500).json({ message: 'Erreur serveur' });
 
@@ -2046,11 +2054,11 @@ app.get('/api/admin/users/\:id', verifierToken, verifierAdmin, async (req, res) 
 
 // ==========================================
 
-// ROUTE PUT /api/admin/users/\:id/role - VIDE STATS CACHE
+// ROUTE PUT /api/admin/users/:id/role - VIDE STATS CACHE
 
 // ==========================================
 
-app.put('/api/admin/users/\:id/role', verifierToken, verifierAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/role', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
@@ -2094,11 +2102,11 @@ app.put('/api/admin/users/\:id/role', verifierToken, verifierAdmin, async (req, 
 
 // ==========================================
 
-// ROUTE DELETE /api/admin/users/\:id - VIDE STATS CACHE
+// ROUTE DELETE /api/admin/users/:id - VIDE STATS CACHE
 
 // ==========================================
 
-app.delete('/api/admin/users/\:id', verifierToken, verifierAdmin, async (req, res) => {
+app.delete('/api/admin/users/:id', verifierToken, verifierAdmin, async (req, res) => {
 
     try {
 
@@ -2163,23 +2171,23 @@ const [orders] = await db.promise().query(`
 
 // ==========================================
 
-// ROUTE PUT /api/admin/orders/\:id/status - AVEC TRANSACTION
+// ROUTE PUT /api/admin/orders/:id/status - AVEC TRANSACTION
 
 // ==========================================
 
-// ROUTE PUT /api/admin/orders/\:id/status - AVEC TRANSACTION (CORRIGÉE)
+// ROUTE PUT /api/admin/orders/:id/status - AVEC TRANSACTION (CORRIGÉE)
 
 // ==========================================
 
-// ROUTE PUT /api/admin/orders/\:id/status - AVEC LOGIQUE STOCK
+// ROUTE PUT /api/admin/orders/:id/status - AVEC LOGIQUE STOCK
 
 // ==========================================
 
-// ROUTE PUT /api/admin/orders/\:id/status - LOGIQUE STOCK SIMPLIFIÉE
+// ROUTE PUT /api/admin/orders/:id/status - LOGIQUE STOCK SIMPLIFIÉE
 
 // ==========================================
 
-app.put('/api/admin/orders/\:id/status', verifierToken, verifierAdmin, async (req, res) => {
+app.put('/api/admin/orders/:id/status', verifierToken, verifierAdmin, async (req, res) => {
 
     const connection = db.promise();
 
@@ -2231,7 +2239,7 @@ app.put('/api/admin/orders/\:id/status', verifierToken, verifierAdmin, async (re
 
             // Vérifier si le stock n'a pas déjà été déduit (cas où on était déjà en préparation)
 
-            // Si on vient de en\_attente ou en\_preparation, on déduit le stock
+            // Si on vient de en_attente ou en_preparation, on déduit le stock
 
             for (const ligne of lignes) {
 
@@ -2447,7 +2455,7 @@ app.get('/api/mes-commandes', verifierToken, async (req, res) => {
 
         const [commandes] = await db.promise().query(
 
-            `SELECT c.\* 
+            `SELECT c.* 
 
              FROM commandes c
 
@@ -2475,11 +2483,11 @@ app.get('/api/mes-commandes', verifierToken, async (req, res) => {
 
 // ==========================================
 
-// ROUTE GET /api/commandes/\:id
+// ROUTE GET /api/commandes/:id
 
 // ==========================================
 
-app.get('/api/commandes/\:id', verifierToken, async (req, res) => {
+app.get('/api/commandes/:id', verifierToken, async (req, res) => {
 
     try {
 
@@ -2775,7 +2783,7 @@ app.post('/api/auth/resend-password-otp', verifierToken, async (req, res) => {
 
 await resend.emails.send({
 
-    from: 'Ma Boutique <onboarding\@resend.dev>',
+    from: 'Ma Boutique <onboarding@resend.dev>',
 
     to: email,
 
@@ -2825,7 +2833,7 @@ await resend.emails.send({
 
 app.get('/api/health', (req, res) => {
 
-    redisClient.setex('health\_test', 10, 'ok', (err) => {
+    redisClient.setex('health_test', 10, 'ok', (err) => {
 
         if (err) {
 
@@ -2867,6 +2875,6 @@ app.get('/api/health', (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
 
-    console.log(`🚀 Serveur sur http\://localhost:${PORT}`);
+    console.log(`🚀 Serveur sur http://localhost:${PORT}`);
 
 });
