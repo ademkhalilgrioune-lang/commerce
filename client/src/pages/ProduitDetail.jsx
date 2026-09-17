@@ -57,7 +57,7 @@ const getImageUrl = (photoPath) => {
     if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
         return photoPath;
     }
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    const API_URL = import.meta.env.VITE_API_URL ;
     return `${API_URL}${photoPath}`;
 };
 
